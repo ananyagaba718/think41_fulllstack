@@ -4,7 +4,7 @@ from database import SessionLocal
 from schemas import ChatRequest, ChatResponse, MessageSchema
 from crud import get_or_create_conversation, save_message
 from chat import query_llm
-
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 def get_db():
@@ -13,6 +13,14 @@ def get_db():
     yield db
   finally:
     db.close()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/api/chat", response_model=ChatResponse)
 def chat(req: ChatRequest, db: Session = Depends(get_db)):
